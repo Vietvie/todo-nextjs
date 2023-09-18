@@ -11,15 +11,19 @@ function Todo() {
     const options = [
         {
             value: 'viet',
-            label: 'Viet Nguyen',
+            label: 'Việt',
         },
         {
             value: 'dao',
-            label: 'Dao',
+            label: 'Đạo',
         },
         {
             value: 'dong',
-            label: 'Dong',
+            label: 'Đông',
+        },
+        {
+            value: 'thinh',
+            label: 'Thịnh',
         },
     ];
     const [todo, setTodo] = useState('');
@@ -33,7 +37,7 @@ function Todo() {
     const inputRef = useRef<HTMLInputElement>(null);
     const dateRef = useRef<HTMLInputElement>(null);
     const handleInput = (e: FormEvent<HTMLInputElement>) => {
-        const value = setTodo(e.currentTarget.value.trim());
+        const value = setTodo(e.currentTarget.value);
     };
 
     console.log(todoList);
@@ -43,7 +47,7 @@ function Todo() {
             dispatch(
                 todoAction.addTodo(
                     new TodoState(
-                        todo,
+                        todo.trim(),
                         new Date(date).getTime(),
                         'pending',
                         'Viet', // Default hardcode
@@ -78,9 +82,9 @@ function Todo() {
         setDate(e.currentTarget.value);
     };
     return (
-        <div className="h-screen flex text-black bg-zinc-100 flex-col justify-center items-center ">
-            <div className="w-full p-8 flex flex-col gap-8">
-                <h1 className="text-black">Todo app</h1>
+        <div className="h-screen flex text-black bg-zinc-100 flex-col items-center ">
+            <div className="w-full p-8 flex flex-col gap-8 h-full overflow-auto">
+                <h1 className="text-black font-semibold text-2xl">Todo app</h1>
                 <div className="flex gap-2 items-center bg-white rounded-lg shadow-md ">
                     <input
                         onKeyDown={handleEnter}
@@ -119,7 +123,9 @@ function Todo() {
                         Add
                     </button>
                 </div>
-                <TodoList list={todoList} onRemove={handleRemove} />
+                <div className="flex-1 overflow-auto">
+                    <TodoList list={todoList} onRemove={handleRemove} />
+                </div>
             </div>
         </div>
     );

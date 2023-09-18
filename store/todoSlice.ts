@@ -7,7 +7,7 @@ const todoSlice = createSlice({
     initialState,
     reducers: {
         addTodo: (state, action: PayloadAction<TodoState>) => {
-            return [action.payload, ...state];
+            return [...state, action.payload];
         },
         removeTodo: (state, action: PayloadAction<number>) => {
             return state.filter((el) => el.id !== action.payload);
@@ -17,8 +17,9 @@ const todoSlice = createSlice({
             action: PayloadAction<{ id: number; status: string }>
         ) => {
             return state.map((el) => {
-                if (el.id === action.payload.id)
+                if (el.id === action.payload.id) {
                     return { ...el, status: action.payload.status };
+                }
                 return el;
             });
         },

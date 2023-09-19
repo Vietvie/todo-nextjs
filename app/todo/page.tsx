@@ -4,7 +4,6 @@ import TodoList from './TodoList';
 import { useDispatch } from 'react-redux';
 import { AppDispatch, useAppSelector } from '@/store';
 import { todoAction } from '@/store/todoSlice';
-import TodoState from '@/models/TodoState';
 import Select from '@/components/Select';
 
 function Todo() {
@@ -40,20 +39,19 @@ function Todo() {
         const value = setTodo(e.currentTarget.value);
     };
 
-    console.log(todoList);
-
     const handleAddTodo = () => {
         if (todo && date && selected) {
             dispatch(
                 todoAction.addTodo({
                     createBy: 'Viet',
                     deadlineTime: Date.now(),
-                    name: todo,
-                    processBy: selected.label,
-                    status: 'pending',
+                    name: { value: todo, editing: false },
+                    processBy: selected.value,
                 })
             );
             setTodo('');
+            setDate(null);
+            setSelected(null);
             inputRef.current?.focus();
         }
     };
@@ -94,13 +92,16 @@ function Todo() {
                         placeholder="Your todo"
                     />
                     <div className=" flex h-full justify-center items-center gap-2 whitespace-nowrap">
-                        <div onClick={handleOpenDatePicker}>
+                        <div
+                            onClick={handleOpenDatePicker}
+                            className="relative"
+                        >
                             <span>{date || 'Deadline'}</span>
                             <input
+                                className="w-0 h-0 absolute top-full mt-1 left-0"
                                 type="date"
                                 placeholder="Deadline"
                                 ref={dateRef}
-                                hidden
                                 onChange={handlePickDate}
                             />
                         </div>

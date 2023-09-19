@@ -1,20 +1,20 @@
 class TodoState {
     id: number;
-    name: string;
+    name: { value: string; editing: boolean };
     createTime: number;
     deadlineTime: number;
     status: string;
     createBy: string;
     processBy: string;
     constructor(
-        name: string,
+        name: { value: string; editing: boolean },
         deadlineTime: number,
         status: string,
         createBy: string,
         processBy: string
     ) {
         this.id = Date.now();
-        this.name = name;
+        this.name = { value: name.value, editing: name.editing };
         this.createTime = Date.now();
         this.deadlineTime = deadlineTime;
         this.status = status || 'pending';

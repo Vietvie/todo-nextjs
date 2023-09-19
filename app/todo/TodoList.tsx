@@ -6,8 +6,11 @@ import convertStatus from '@/utils/convertStatus';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format } from 'date-fns';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import EditTaskName from './EditTaskName';
+import userList from '@/dev-data/user';
+import convertUserName from '@/utils/covertUserName';
 
 type todoList = {
     list: TodoState[];
@@ -31,16 +34,46 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
         },
     ];
 
+    const dateInputRef = useRef<HTMLInputElement>(null);
     const handleUpdateStatus = (
         select: { value: string; label: string },
         id?: number
     ) => {
-        console.log(id, select);
         if (!id) return;
         dispatch(
             todoAction.updateStatus({
                 id,
                 status: select.value,
+            })
+        );
+    };
+
+    const handleUpdateProcessUser = (
+        select: { value: string; label: string },
+        id?: number
+    ) => {
+        if (!id) return;
+        dispatch(
+            todoAction.updateProcessUser({
+                id,
+                newUserProcess: select.value,
+            })
+        );
+    };
+
+    const handleOpenEditTaskName = (id: number) => {
+        dispatch(todoAction.openEditTaskName(id));
+    };
+
+    const handleOpenDatePicker = () => {
+        dateInputRef.current?.showPicker();
+    };
+
+    const handleUpdateDeadline = (newDeadline: string, id: number) => {
+        dispatch(
+            todoAction.updateDeadline({
+                id,
+                newDeadline: new Date(newDeadline).getTime(),
             })
         );
     };
@@ -67,12 +100,41 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                             className="bg-white hover:bg-slate-200 rounded-lg"
                         >
                             <td className="p-2">{index + 1}</td>
-                            <td className="p-2">{el.name}</td>
+                            <td
+                                onClick={() => handleOpenEditTaskName(el.id)}
+                                className="p-2"
+                            >
+                                <div className="relative">
+                                    <span>{el.name.value}</span>
+                                    {el.name.editing && (
+                                        <EditTaskName
+                                            id={el.id}
+                                            taskName={el.name.value}
+                                        />
+                                    )}
+                                </div>
+                            </td>
                             <td className="p-2">
                                 {format(el.createTime, 'dd/MM/yyyy')}
                             </td>
-                            <td className="p-2">
-                                {format(el.deadlineTime, 'dd/MM/yyyy')}
+                            <td
+                                className="p-2 relative"
+                                onClick={handleOpenDatePicker}
+                            >
+                                <div className="relative">
+                                    {format(el.deadlineTime, 'dd/MM/yyyy')}
+                                    <input
+                                        className="w-0 h-0 absolute top-full mt-1 left-0"
+                                        type="date"
+                                        ref={dateInputRef}
+                                        onChange={(e) =>
+                                            handleUpdateDeadline(
+                                                e.target.value,
+                                                el.id
+                                            )
+                                        }
+                                    />
+                                </div>
                             </td>
                             <td className="p-2">
                                 <Select
@@ -87,7 +149,18 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                                 />
                             </td>
                             <td className="p-2">{el.createBy}</td>
-                            <td className="p-2">{el.processBy}</td>
+                            <td className="p-2  cursor-pointer">
+                                <Select
+                                    titleStyle="hover:text-white hover:bg-green-600 cursor-pointer"
+                                    id={el.id}
+                                    options={userList}
+                                    value={{
+                                        value: el.processBy,
+                                        label: convertUserName(el.processBy),
+                                    }}
+                                    onSelect={handleUpdateProcessUser}
+                                />
+                            </td>
                             <td className="p-2 flex justify-center">
                                 <span
                                     onClick={() => onRemove(el.id)}

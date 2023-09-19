@@ -45,15 +45,13 @@ function Todo() {
     const handleAddTodo = () => {
         if (todo && date && selected) {
             dispatch(
-                todoAction.addTodo(
-                    new TodoState(
-                        todo.trim(),
-                        new Date(date).getTime(),
-                        'pending',
-                        'Viet', // Default hardcode
-                        selected.label
-                    )
-                )
+                todoAction.addTodo({
+                    createBy: 'Viet',
+                    deadlineTime: Date.now(),
+                    name: todo,
+                    processBy: selected.label,
+                    status: 'pending',
+                })
             );
             setTodo('');
             inputRef.current?.focus();

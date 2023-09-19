@@ -33,7 +33,7 @@ const Select: React.FC<{
             className="h-full whitespace-nowrap relative flex items-center cursor-default"
             tabIndex={1}
         >
-            <span className={`${titleStyle || ''} py-[2px] px-1 rounded-lg`}>
+            <span className={`rounded-lg py-[2px] px-1 ${titleStyle}`}>
                 {value ? value.label : placehodler || 'select...'}
             </span>
             <ul

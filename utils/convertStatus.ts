@@ -13,7 +13,7 @@ const convertStatus = (status: string) => {
         case 'completed':
             statusConverted = {
                 label: 'Đã hoàn thành',
-                style: 'text-green-600 bg-green-100',
+                style: ' !text-green-600 bg-green-100',
             };
             break;
         case 'cancelled':

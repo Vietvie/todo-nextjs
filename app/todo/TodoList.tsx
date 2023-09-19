@@ -56,7 +56,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                         <th className="p-2">Deadline</th>
                         <th className="p-2">Trạng thái</th>
                         <th className="p-2">Người tạo</th>
-                        <th className="p-2">Ngày tạo</th>
+                        <th className="p-2">Ngày xử lý</th>
                         <th className=" text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -69,7 +69,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                             <td className="p-2">{index + 1}</td>
                             <td className="p-2">{el.name}</td>
                             <td className="p-2">
-                                {format(el.creatTime, 'dd/MM/yyyy')}
+                                {format(el.createTime, 'dd/MM/yyyy')}
                             </td>
                             <td className="p-2">
                                 {format(el.deadlineTime, 'dd/MM/yyyy')}

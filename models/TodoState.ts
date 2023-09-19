@@ -1,7 +1,7 @@
 class TodoState {
     id: number;
     name: string;
-    creatTime: number;
+    createTime: number;
     deadlineTime: number;
     status: string;
     createBy: string;
@@ -15,7 +15,7 @@ class TodoState {
     ) {
         this.id = Date.now();
         this.name = name;
-        this.creatTime = Date.now();
+        this.createTime = Date.now();
         this.deadlineTime = deadlineTime;
         this.status = status || 'pending';
         this.createBy = createBy;

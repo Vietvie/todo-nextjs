@@ -1,13 +1,19 @@
 import TodoState from '@/models/TodoState';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
+interface TodoTemplate extends Omit<TodoState, 'id' | 'createTime'> {}
+
 const initialState: TodoState[] = [];
 const todoSlice = createSlice({
     name: 'todo',
     initialState,
     reducers: {
-        addTodo: (state, action: PayloadAction<TodoState>) => {
-            return [...state, action.payload];
+        addTodo: (state, action: PayloadAction<TodoTemplate>) => {
+            state = [
+                ...state,
+                { ...action.payload, id: Date.now(), createTime: Date.now() },
+            ];
+            return state;
         },
         removeTodo: (state, action: PayloadAction<number>) => {
             return state.filter((el) => el.id !== action.payload);

@@ -1,14 +1,28 @@
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { id } from 'date-fns/locale';
-import React, { useState } from 'react';
+import React, { MouseEvent, useState } from 'react';
 
 const Select: React.FC<{
+    isClearable?: boolean | false;
     titleStyle?: string;
     id?: number;
     options: { value: string; label: string }[];
     placehodler?: string | undefined;
-    onSelect: (select: { value: string; label: string }, id?: number) => void;
+    onSelect: (
+        select: { value: string; label: string } | null,
+        id?: number
+    ) => void;
     value: { value: string; label: string } | null;
-}> = ({ options, placehodler, value, onSelect, id, titleStyle }) => {
+}> = ({
+    options,
+    placehodler,
+    value,
+    onSelect,
+    id,
+    titleStyle,
+    isClearable,
+}) => {
     const [openSelect, setOpenSelect] = useState<boolean>(false);
     const handleOpen = () => {
         setOpenSelect((prev) => !prev);
@@ -21,21 +35,33 @@ const Select: React.FC<{
         select: { value: string; label: string },
         id?: number
     ) => {
-        console.log('select');
         onSelect(select, id);
         setOpenSelect(false);
+    };
+
+    const handleRemoveSelect = (e: MouseEvent<HTMLElement>) => {
+        e.stopPropagation();
+        onSelect(null);
     };
 
     return (
         <div
             onClick={handleOpen}
             onBlur={handleBlur}
-            className="h-full whitespace-nowrap relative flex items-center cursor-default"
+            className="h-full whitespace-nowrap relative flex justify-between px-2 items-center cursor-defaul "
             tabIndex={1}
         >
             <span className={`rounded-lg py-[2px] px-1 ${titleStyle}`}>
                 {value ? value.label : placehodler || 'select...'}
             </span>
+            {isClearable && value && (
+                <span onClick={handleRemoveSelect}>
+                    <FontAwesomeIcon
+                        className="pointer-events-none p-1"
+                        icon={faXmark}
+                    />
+                </span>
+            )}
             <ul
                 onClick={(e) => e.stopPropagation()}
                 className={`absolute z-10 top-full mt-1 w-full bg-white ${

@@ -88,6 +88,21 @@ const todoSlice = createSlice({
                 return el;
             });
         },
+        sort(
+            state,
+            action: PayloadAction<{
+                sortBy: 'createTime' | 'deadlineTime';
+                sortType?: 'asc' | 'desc';
+            }>
+        ) {
+            const sortByArr = state.sort((a: TodoState, b: TodoState) => {
+                if (action.payload.sortType === 'desc') {
+                    return b[action.payload.sortBy] - a[action.payload.sortBy];
+                }
+                return a[action.payload.sortBy] - b[action.payload.sortBy];
+            });
+            return sortByArr;
+        },
     },
 });
 

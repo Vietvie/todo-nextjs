@@ -6,11 +6,12 @@ import convertStatus from '@/utils/convertStatus';
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { format } from 'date-fns';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import EditTaskName from './EditTaskName';
 import userList from '@/dev-data/user';
 import convertUserName from '@/utils/covertUserName';
+import statusOptions from '@/dev-data/stauts';
 
 type todoList = {
     list: TodoState[];
@@ -19,27 +20,28 @@ type todoList = {
 
 const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const statusOptions = [
-        {
-            value: 'pending',
-            label: 'Đang xử lý',
-        },
-        {
-            value: 'completed',
-            label: 'Đã hoàn thành',
-        },
-        {
-            value: 'cancelled',
-            label: 'Đã huỷ',
-        },
-    ];
 
+    const [sortList, setSortList] = useState<
+        {
+            sortBy: 'createTime' | 'deadlineTime';
+            sortType: 'asc' | 'desc';
+        }[]
+    >([
+        {
+            sortBy: 'createTime',
+            sortType: 'asc',
+        },
+        {
+            sortBy: 'deadlineTime',
+            sortType: 'asc',
+        },
+    ]);
     const dateInputRef = useRef<HTMLInputElement>(null);
     const handleUpdateStatus = (
-        select: { value: string; label: string },
+        select: { value: string; label: string } | null,
         id?: number
     ) => {
-        if (!id) return;
+        if (!id || !select) return;
         dispatch(
             todoAction.updateStatus({
                 id,
@@ -49,10 +51,10 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
     };
 
     const handleUpdateProcessUser = (
-        select: { value: string; label: string },
+        select: { value: string; label: string } | null,
         id?: number
     ) => {
-        if (!id) return;
+        if (!id || !select) return;
         dispatch(
             todoAction.updateProcessUser({
                 id,
@@ -78,6 +80,34 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
         );
     };
 
+    const handleSort = (sortBy: 'createTime' | 'deadlineTime') => {
+        dispatch(
+            todoAction.sort({
+                sortBy,
+                sortType: sortList.find((el) => el.sortBy === sortBy)?.sortType,
+            })
+        );
+    };
+
+    const toggleSort = (sortBy: 'createTime' | 'deadlineTime') => {
+        dispatch(
+            todoAction.sort({
+                sortBy: sortBy,
+                sortType: sortList.find((el) => el.sortBy === sortBy)?.sortType,
+            })
+        );
+        setSortList((prev) =>
+            prev.map((el) => {
+                if (el.sortBy === sortBy) {
+                    return {
+                        ...el,
+                        sortType: el.sortType === 'asc' ? 'desc' : 'asc',
+                    };
+                }
+                return el;
+            })
+        );
+    };
     return (
         <div className="h-full">
             <table className="w-full">
@@ -85,8 +115,18 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                     <tr>
                         <th className="p-2">#</th>
                         <th className="p-2">Task</th>
-                        <th className="p-2">Ngày tạo</th>
-                        <th className="p-2">Deadline</th>
+                        <th
+                            onClick={() => toggleSort('createTime')}
+                            className="p-2"
+                        >
+                            Ngày tạo
+                        </th>
+                        <th
+                            onClick={() => toggleSort('deadlineTime')}
+                            className="p-2"
+                        >
+                            Deadline
+                        </th>
                         <th className="p-2">Trạng thái</th>
                         <th className="p-2">Người tạo</th>
                         <th className="p-2">Ngày xử lý</th>

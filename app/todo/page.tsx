@@ -1,10 +1,11 @@
 'use client';
 import React, { FormEvent, useRef, useState, KeyboardEvent } from 'react';
 import TodoList from './TodoList';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, useAppSelector } from '@/store';
 import { todoAction } from '@/store/todoSlice';
 import Select from '@/components/Select';
+import Search from './Search';
 
 function Todo() {
     const options = [
@@ -36,15 +37,25 @@ function Todo() {
     const inputRef = useRef<HTMLInputElement>(null);
     const dateRef = useRef<HTMLInputElement>(null);
     const handleInput = (e: FormEvent<HTMLInputElement>) => {
-        const value = setTodo(e.currentTarget.value);
+        setTodo(e.currentTarget.value);
     };
+
+    const filter = useAppSelector((state) => state.filter);
+    const todoListFiltered = todoList.filter((el) => {
+        return (
+            el.name.value.includes(filter.task) &&
+            el.status.includes(filter.status)
+        );
+    });
+
+    console.log(todoListFiltered);
 
     const handleAddTodo = () => {
         if (todo && date && selected) {
             dispatch(
                 todoAction.addTodo({
                     createBy: 'Viet',
-                    deadlineTime: Date.now(),
+                    deadlineTime: new Date(date).getTime(),
                     name: { value: todo, editing: false },
                     processBy: selected.value,
                 })
@@ -66,7 +77,7 @@ function Todo() {
         dispatch(todoAction.removeTodo(id));
     };
 
-    const handleSelect = (select: { value: string; label: string }) => {
+    const handleSelect = (select: { value: string; label: string } | null) => {
         setSelected(select);
     };
 
@@ -122,8 +133,9 @@ function Todo() {
                         Add
                     </button>
                 </div>
+                <Search />
                 <div className="flex-1 overflow-auto">
-                    <TodoList list={todoList} onRemove={handleRemove} />
+                    <TodoList list={todoListFiltered} onRemove={handleRemove} />
                 </div>
             </div>
         </div>

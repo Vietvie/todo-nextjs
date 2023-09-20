@@ -1,7 +1,7 @@
 'use client';
 import React, { FormEvent, useRef, useState, KeyboardEvent } from 'react';
 import TodoList from './TodoList';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { AppDispatch, useAppSelector } from '@/store';
 import { todoAction } from '@/store/todoSlice';
 import Select from '@/components/Select';
@@ -47,9 +47,6 @@ function Todo() {
             el.status.includes(filter.status)
         );
     });
-
-    console.log(todoListFiltered);
-
     const handleAddTodo = () => {
         if (todo && date && selected) {
             dispatch(

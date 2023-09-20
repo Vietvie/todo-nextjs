@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int        @id @default(autoincrement())
+  email String     @unique
+  name  String?
+  todos UserTodo[]
+  onwer Todo[]
+
+  @@map("users")
+}
+
+model Todo {
+  id            Int        @id @default(autoincrement())
+  name          String
+  create_time   Int
+  deadline_time Int
+  create_by_id  Int
+  create_by     User       @relation(fields: [create_by_id], references: [id])
+  assignees     UserTodo[]
+  status        String     @default("pending")
+
+  @@map("todos")
+}
+
+model UserTodo {
+  user_id Int
+  todo_id Int
+  user    User @relation(fields: [user_id], references: [id])
+  todo    Todo @relation(fields: [todo_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, todo_id])
+  @@map("user_todos")
+}

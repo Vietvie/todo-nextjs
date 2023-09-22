@@ -1,24 +1,20 @@
 import TodoState from '@/models/TodoState';
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-interface TodoTemplate
-    extends Omit<TodoState, 'id' | 'createTime' | 'status'> {}
+// interface TodoTemplate
+//     extends Omit<TodoState, 'id' | 'createTime' | 'status'> {}
 
 const initialState: TodoState[] = [];
 const todoSlice = createSlice({
     name: 'todo',
     initialState,
     reducers: {
-        addTodo: (state, action: PayloadAction<TodoTemplate>) => {
-            state = [
-                ...state,
-                {
-                    ...action.payload,
-                    id: Date.now(),
-                    createTime: Date.now(),
-                    status: 'pending',
-                },
-            ];
+        addTodo: (state, action: PayloadAction<TodoState>) => {
+            state.push(action.payload);
+            return state;
+        },
+        setTodo(state, action: PayloadAction<TodoState[]>) {
+            state = action.payload;
             return state;
         },
         removeTodo: (state, action: PayloadAction<number>) => {
@@ -26,7 +22,7 @@ const todoSlice = createSlice({
         },
         updateStatus(
             state,
-            action: PayloadAction<{ id: number; status: string }>
+            action: PayloadAction<{ id: number; status: string | number }>
         ) {
             return state.map((el) => {
                 if (el.id === action.payload.id) {
@@ -41,7 +37,13 @@ const todoSlice = createSlice({
         ) {
             return state.map((el) => {
                 if (el.id === action.payload.id) {
-                    return { ...el, processBy: action.payload.newUserProcess };
+                    return {
+                        ...el,
+                        processBy: [
+                            ...el.processBy,
+                            action.payload.newUserProcess,
+                        ],
+                    };
                 }
                 return el;
             });

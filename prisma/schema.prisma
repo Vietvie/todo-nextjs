@@ -11,11 +11,12 @@ datasource db {
 }
 
 model User {
-  id    Int        @id @default(autoincrement())
-  email String     @unique
-  name  String?
-  todos UserTodo[]
-  onwer Todo[]
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
+  name     String?
+  password String
+  todos    UserTodo[]
+  onwer    Todo[]
 
   @@map("users")
 }

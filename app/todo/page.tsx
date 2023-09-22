@@ -1,11 +1,19 @@
 'use client';
-import React, { FormEvent, useRef, useState, KeyboardEvent } from 'react';
+import React, {
+    FormEvent,
+    useRef,
+    useState,
+    KeyboardEvent,
+    useEffect,
+} from 'react';
 import TodoList from './TodoList';
 import { useDispatch } from 'react-redux';
 import { AppDispatch, useAppSelector } from '@/store';
 import { todoAction } from '@/store/todoSlice';
-import Select from '@/components/Select';
+import Select, { SelectOption } from '@/components/Select';
 import Search from './Search';
+import todoApi from '@/services/todo';
+import { getUnixTime } from 'date-fns';
 
 function Todo() {
     const options = [
@@ -27,10 +35,7 @@ function Todo() {
         },
     ];
     const [todo, setTodo] = useState('');
-    const [selected, setSelected] = useState<{
-        value: string;
-        label: string;
-    } | null>(null);
+    const [selected, setSelected] = useState<SelectOption | null>(null);
     const [date, setDate] = useState<string | null>(null);
     const todoList = useAppSelector((state) => state.todo);
     const dispatch = useDispatch<AppDispatch>();
@@ -40,23 +45,17 @@ function Todo() {
         setTodo(e.currentTarget.value);
     };
 
-    const filter = useAppSelector((state) => state.filter);
-    const todoListFiltered = todoList.filter((el) => {
-        return (
-            el.name.value.includes(filter.task) &&
-            el.status.includes(filter.status)
-        );
-    });
-    const handleAddTodo = () => {
+    const handleAddTodo = async () => {
         if (todo && date && selected) {
-            dispatch(
-                todoAction.addTodo({
-                    createBy: 'Viet',
-                    deadlineTime: new Date(date).getTime(),
-                    name: { value: todo, editing: false },
-                    processBy: selected.value,
-                })
-            );
+            const { data } = await todoApi.addNewTodo({
+                create_time: getUnixTime(Date.now()),
+                deadline_time: getUnixTime(Date.now()),
+                name: todo,
+                process_by_id: 4,
+            });
+
+            dispatch(todoAction.addTodo(data.data.todo));
+
             setTodo('');
             setDate(null);
             setSelected(null);
@@ -74,7 +73,7 @@ function Todo() {
         dispatch(todoAction.removeTodo(id));
     };
 
-    const handleSelect = (select: { value: string; label: string } | null) => {
+    const handleSelect = (select: SelectOption | null) => {
         setSelected(select);
     };
 
@@ -85,6 +84,19 @@ function Todo() {
     const handlePickDate = (e: FormEvent<HTMLInputElement>) => {
         setDate(e.currentTarget.value);
     };
+
+    useEffect(() => {
+        const fetchMyTodo = async () => {
+            try {
+                const { data } = await todoApi.myTodo();
+                console.log(data.data.myTodoMaped);
+                dispatch(todoAction.setTodo(data.data.myTodoMaped));
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchMyTodo();
+    }, []);
     return (
         <div className="h-screen flex text-black bg-zinc-100 flex-col items-center ">
             <div className="w-full p-8 flex flex-col gap-8 h-full overflow-auto">
@@ -132,7 +144,7 @@ function Todo() {
                 </div>
                 <Search />
                 <div className="flex-1 overflow-auto">
-                    <TodoList list={todoListFiltered} onRemove={handleRemove} />
+                    <TodoList list={todoList} onRemove={handleRemove} />
                 </div>
             </div>
         </div>

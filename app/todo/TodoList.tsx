@@ -1,4 +1,4 @@
-import Select from '@/components/Select';
+import Select, { SelectOption } from '@/components/Select';
 import TodoState from '@/models/TodoState';
 import { AppDispatch } from '@/store';
 import { todoAction } from '@/store/todoSlice';
@@ -37,10 +37,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
         },
     ]);
     const dateInputRef = useRef<HTMLInputElement>(null);
-    const handleUpdateStatus = (
-        select: { value: string; label: string } | null,
-        id?: number
-    ) => {
+    const handleUpdateStatus = (select: SelectOption | null, id?: number) => {
         if (!id || !select) return;
         dispatch(
             todoAction.updateStatus({
@@ -129,7 +126,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                         </th>
                         <th className="p-2">Trạng thái</th>
                         <th className="p-2">Người tạo</th>
-                        <th className="p-2">Ngày xử lý</th>
+                        <th className="p-2">Người xử lý</th>
                         <th className=" text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -190,16 +187,18 @@ const TodoList: React.FC<todoList> = ({ list, onRemove }) => {
                             </td>
                             <td className="p-2">{el.createBy}</td>
                             <td className="p-2  cursor-pointer">
-                                <Select
+                                {/* <Select
                                     titleStyle="hover:text-white hover:bg-green-600 cursor-pointer"
                                     id={el.id}
                                     options={userList}
-                                    value={{
-                                        value: el.processBy,
-                                        label: convertUserName(el.processBy),
-                                    }}
+                                    value={null}
                                     onSelect={handleUpdateProcessUser}
-                                />
+                                /> */}
+                                {el.processBy.map((el) => (
+                                    <div>
+                                        <span>{el.split('@')[1]}</span>
+                                    </div>
+                                ))}
                             </td>
                             <td className="p-2 flex justify-center">
                                 <span

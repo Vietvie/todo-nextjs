@@ -3,17 +3,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { id } from 'date-fns/locale';
 import React, { MouseEvent, useState } from 'react';
 
+export interface SelectOption {
+    value: string | number;
+    label: string;
+}
+
+interface SingleSelectProps {
+    multiple?: false;
+}
+
 const Select: React.FC<{
     isClearable?: boolean | false;
     titleStyle?: string;
     id?: number;
-    options: { value: string; label: string }[];
+    options: SelectOption[];
     placehodler?: string | undefined;
-    onSelect: (
-        select: { value: string; label: string } | null,
-        id?: number
-    ) => void;
-    value: { value: string; label: string } | null;
+    onSelect: (select: SelectOption | null, id?: number) => void;
+    value: SelectOption | null;
 }> = ({
     options,
     placehodler,
@@ -31,10 +37,7 @@ const Select: React.FC<{
         setOpenSelect(false);
     };
 
-    const handleSelect = (
-        select: { value: string; label: string },
-        id?: number
-    ) => {
+    const handleSelect = (select: SelectOption, id?: number) => {
         onSelect(select, id);
         setOpenSelect(false);
     };

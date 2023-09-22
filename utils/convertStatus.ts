@@ -1,4 +1,4 @@
-const convertStatus = (status: string) => {
+const convertStatus = (status: string | number) => {
     let statusConverted: { label: string; style: string } = {
         label: 'Đang xử lý',
         style: 'bg-orange-100 text-orange-600',

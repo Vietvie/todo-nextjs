@@ -1,9 +1,22 @@
-import axios from 'axios';
+import axiosClient from './axiosClient';
 
-const todoServices = {
+const todoApi = {
     getTodo() {
-        return axios.get<{ message: string }>('/');
+        return axiosClient.get('/todo');
+    },
+    myTodo() {
+        const baseURL = '/todo/mytodo';
+        return axiosClient.get(baseURL);
+    },
+    addNewTodo(data: {
+        name: string;
+        create_time: number;
+        deadline_time: number;
+        process_by_id: number;
+    }) {
+        const baseURL = '/todo';
+        return axiosClient.post(baseURL, data);
     },
 };
 
-export default todoServices;
+export default todoApi;

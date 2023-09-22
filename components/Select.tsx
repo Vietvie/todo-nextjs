@@ -55,8 +55,8 @@ const Select: React.FC<SelectProps> = ({
             }
         } else {
             onSelect(value, id);
-            setOpenSelect(false);
         }
+        setOpenSelect(false);
     };
 
     const handleRemoveMultipleSelect = async (
@@ -65,7 +65,7 @@ const Select: React.FC<SelectProps> = ({
     ) => {
         if (multiple) {
             if (onRemove && id) {
-                await onRemove(select, id);
+                return onRemove(select, id);
             }
             onSelect(
                 value.filter((el) => el.value !== select.value),

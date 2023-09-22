@@ -118,6 +118,21 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                 user_id: select.value,
                 todo_id: id,
             });
+
+            dispatch(
+                todoAction.setTodo(
+                    list.map((el) => {
+                        if (el.id === id)
+                            return {
+                                ...el,
+                                processBy: el.processBy.filter(
+                                    (el2) => el2.value !== select.value
+                                ),
+                            };
+                        return el;
+                    })
+                )
+            );
         } catch (error) {
             console.log(error);
         }

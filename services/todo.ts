@@ -12,10 +12,14 @@ const todoApi = {
         name: string;
         create_time: number;
         deadline_time: number;
-        process_by_id: number;
+        process_by_id: (number | string)[];
     }) {
         const baseURL = '/todo';
         return axiosClient.post(baseURL, data);
+    },
+    updateAssigness(id: number, data: { processBy: (number | string)[] }) {
+        const baseURL = `todo/${id}`;
+        return axiosClient.put(baseURL, data);
     },
 };
 

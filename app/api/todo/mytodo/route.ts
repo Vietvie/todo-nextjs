@@ -50,7 +50,6 @@ export async function GET(req: NextRequest) {
                             name: true,
                         },
                     },
-                    todo: true,
                 },
             },
             create_by: {
@@ -62,25 +61,16 @@ export async function GET(req: NextRequest) {
         },
     });
 
-    // id: number;
-    // name: { value: string; editing: boolean };
-    // createTime: number;
-    // deadlineTime: number;
-    // status: string;
-    // createBy: string;
-    // processBy: string[];
-
     const myTodoMaped = myTodo.map((el) => ({
         id: el.id,
         status: el.status,
         name: el.name,
         createTime: el.create_time,
         deadlineTime: el.deadline_time,
-        processBy: el.assignees.map((user) =>
-            Object.values(user.user).join('@')
-        ),
+        processBy: el.assignees.map((el) => el.user),
         createBy: Object.values(el.create_by).join('@'),
     }));
+
     return NextResponse.json(
         {
             status: 'success',
@@ -95,10 +85,10 @@ export async function GET(req: NextRequest) {
     );
 }
 
-export const POST = async (req: Request) => {
-    const data = await req.json();
-    const newTodo = await prisma.todo.create({
-        data,
-    });
-    return NextResponse.json(newTodo);
-};
+// export const POST = async (req: Request) => {
+//     const data = await req.json();
+//     const newTodo = await prisma.todo.create({
+//         data,
+//     });
+//     return NextResponse.json(newTodo);
+// };

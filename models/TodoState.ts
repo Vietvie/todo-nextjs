@@ -5,13 +5,13 @@ class TodoState {
     deadlineTime: number;
     status: string | number;
     createBy: string;
-    processBy: string[];
+    processBy: { value: number | string; label: string }[];
     constructor(
         name: { value: string; editing: boolean },
         deadlineTime: number,
         status: string | number,
         createBy: string,
-        processBy: string[]
+        processBy: { value: number | string; label: string }[]
     ) {
         this.id = Date.now();
         this.name = { value: name.value, editing: name.editing };

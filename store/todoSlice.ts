@@ -31,23 +31,23 @@ const todoSlice = createSlice({
                 return el;
             });
         },
-        updateProcessUser(
-            state,
-            action: PayloadAction<{ id: number; newUserProcess: string }>
-        ) {
-            return state.map((el) => {
-                if (el.id === action.payload.id) {
-                    return {
-                        ...el,
-                        processBy: [
-                            ...el.processBy,
-                            action.payload.newUserProcess,
-                        ],
-                    };
-                }
-                return el;
-            });
-        },
+        // updateProcessUser(
+        //     state,
+        //     action: PayloadAction<{ id: number; newUserProcess: string }>
+        // ) {
+        //     return state.map((el) => {
+        //         if (el.id === action.payload.id) {
+        //             return {
+        //                 ...el,
+        //                 processBy: [
+        //                     ...el.processBy,
+        //                     action.payload.newUserProcess,
+        //                 ],
+        //             };
+        //         }
+        //         return el;
+        //     });
+        // },
         openEditTaskName(state, action: PayloadAction<number>) {
             return state.map((el) => {
                 if (el.id === action.payload) {

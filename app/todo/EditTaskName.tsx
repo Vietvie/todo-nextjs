@@ -9,7 +9,6 @@ const EditTaskName: FC<{ id: number; taskName: string }> = ({
 }) => {
     const [newTask, setNewTask] = useState(taskName);
     const dispatch = useDispatch<AppDispatch>();
-    console.log(newTask);
 
     const handleOnChange = (e: FormEvent<HTMLInputElement>) => {
         setNewTask(e.currentTarget.value);

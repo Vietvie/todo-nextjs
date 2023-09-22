@@ -45,7 +45,7 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json(newUserAssigned);
 };
 
-export const DELETE = async (req: NextRequest) => {
+export const PATCH = async (req: NextRequest) => {
     const tokenDecoded = decodeJwt(req);
     if (!tokenDecoded) {
         return NextResponse.json(

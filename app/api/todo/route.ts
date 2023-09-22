@@ -95,9 +95,7 @@ export const POST = async (req: NextRequest) => {
         deadlineTime: newTodo.deadline_time,
         createTime: newTodo.create_time,
         status: newTodo.status,
-        processBy: newTodo.assignees.map((user) =>
-            Object.values(user.user).join('@')
-        ),
+        processBy: newTodo.assignees.map((user) => user.user),
         createBy: Object.values(newTodo.create_by).join('@'),
     };
     return NextResponse.json({

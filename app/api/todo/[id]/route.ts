@@ -4,18 +4,63 @@ import { Prisma } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const GET = async (
-    req: Request,
+    req: NextRequest,
     { params }: { params: { id: number } }
 ) => {
+    const tokenDecoded = decodeJwt(req);
+    if (!tokenDecoded) {
+        return NextResponse.json(
+            {
+                status: 'fail',
+                message: 'please login to access',
+            },
+            {
+                status: 400,
+            }
+        );
+    }
     const id = params.id * 1;
+
     const todoByUser = await prisma.todo.findFirst({
         where: {
             id,
+            OR: [
+                {
+                    create_by_id: tokenDecoded.id,
+                },
+                {
+                    assignees: {
+                        some: {
+                            user_id: tokenDecoded.id,
+                        },
+                    },
+                },
+            ],
         },
-        include: { assignees: true },
     });
 
-    return NextResponse.json(todoByUser);
+    // if (!todoByUser) {
+    //     return NextResponse.redirect(new URL('/todo', req.url));
+    // }
+
+    if (!todoByUser) {
+        return NextResponse.json(
+            {
+                status: 'fail',
+                message: 'You do not have permission to access this todo',
+            },
+            {
+                status: 400,
+            }
+        );
+    }
+
+    return NextResponse.json({
+        status: 'success',
+        data: {
+            todo: todoByUser,
+        },
+    });
 };
 
 export const DELETE = async (
@@ -44,10 +89,15 @@ export const DELETE = async (
     });
 
     if (!currentTodo)
-        return NextResponse.json({
-            status: 'fail',
-            message: `You are not the owner of todo ${id}`,
-        });
+        return NextResponse.json(
+            {
+                status: 'fail',
+                message: `You are not the owner of todo ${id}`,
+            },
+            {
+                status: 400,
+            }
+        );
 
     await prisma.todo.delete({ where: { id } });
     return NextResponse.json(
@@ -77,7 +127,12 @@ export const PUT = async (
     }
     const id = params.id * 1;
     const data:
-        | { status?: string; deadlineTime?: number; processBy?: number[] }
+        | {
+              status?: string;
+              deadlineTime?: number;
+              processBy?: number[];
+              taskName?: string;
+          }
         | undefined = await req.json().catch((err) => console.log(err));
 
     //Update Status By Asignees
@@ -115,28 +170,21 @@ export const PUT = async (
                 },
             });
 
-            const myTodoMaped = {
-                id: todoUpdateStatus.id,
-                status: todoUpdateStatus.status,
-                name: todoUpdateStatus.name,
-                createTime: todoUpdateStatus.create_time,
-                deadlineTime: todoUpdateStatus.deadline_time,
-                processBy: todoUpdateStatus.assignees.map((el) => el.user),
-                createBy: Object.values(todoUpdateStatus.create_by).join('@'),
-            };
             return NextResponse.json({
                 status: 'success',
-                data: {
-                    todoUpdated: myTodoMaped,
-                },
             });
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === 'P2025')
-                    return NextResponse.json({
-                        status: 'fail',
-                        message: 'You do not have permission',
-                    });
+                    return NextResponse.json(
+                        {
+                            status: 'fail',
+                            message: 'You do not have permission',
+                        },
+                        {
+                            status: 400,
+                        }
+                    );
             }
             console.log(error);
         }
@@ -173,29 +221,72 @@ export const PUT = async (
                 },
             });
 
-            const myTodoMaped = {
-                id: todoUpdateDeadline.id,
-                status: todoUpdateDeadline.status,
-                name: todoUpdateDeadline.name,
-                createTime: todoUpdateDeadline.create_time,
-                deadlineTime: todoUpdateDeadline.deadline_time,
-                processBy: todoUpdateDeadline.assignees.map((el) => el.user),
-                createBy: Object.values(todoUpdateDeadline.create_by).join('@'),
-            };
-
             return NextResponse.json({
                 status: 'success',
-                data: {
-                    todoUpdated: myTodoMaped,
-                },
             });
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === 'P2025')
-                    return NextResponse.json({
-                        status: 'fail',
-                        message: 'You do not have permission',
-                    });
+                    return NextResponse.json(
+                        {
+                            status: 'fail',
+                            message: 'You do not have permission',
+                        },
+                        {
+                            status: 400,
+                        }
+                    );
+            }
+            console.log(error);
+        }
+    }
+
+    //update Task name By Owner
+    if (data?.taskName) {
+        try {
+            const todoUpdateDeadline = await prisma.todo.update({
+                where: {
+                    id,
+                    create_by_id: tokenDecoded.id,
+                },
+                data: {
+                    name: data.taskName,
+                },
+                include: {
+                    assignees: {
+                        select: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                    create_by: {
+                        select: {
+                            id: true,
+                            name: true,
+                        },
+                    },
+                },
+            });
+
+            return NextResponse.json({
+                status: 'success',
+            });
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2025')
+                    return NextResponse.json(
+                        {
+                            status: 'fail',
+                            message: 'You do not have permission',
+                        },
+                        {
+                            status: 400,
+                        }
+                    );
             }
             console.log(error);
         }
@@ -258,10 +349,15 @@ export const PUT = async (
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === 'P2025')
-                    return NextResponse.json({
-                        status: 'fail',
-                        message: 'You do not have permission',
-                    });
+                    return NextResponse.json(
+                        {
+                            status: 'fail',
+                            message: 'You do not have permission',
+                        },
+                        {
+                            status: 400,
+                        }
+                    );
             }
             console.log(error);
         }

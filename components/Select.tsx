@@ -25,6 +25,7 @@ type SelectProps = {
     id?: number;
     options: SelectOption[];
     placehodler?: string | undefined;
+    zIndex?: number;
 } & (SingleSelectProps | MultipleSelectProps);
 
 const Select: React.FC<SelectProps> = ({
@@ -37,6 +38,7 @@ const Select: React.FC<SelectProps> = ({
     isClearable,
     multiple,
     onRemove,
+    zIndex,
 }) => {
     const [openSelect, setOpenSelect] = useState<boolean>(false);
     const handleOpen = () => {
@@ -54,7 +56,7 @@ const Select: React.FC<SelectProps> = ({
                 onSelect([...value, select], id);
             }
         } else {
-            onSelect(value, id);
+            onSelect(select, id);
         }
         setOpenSelect(false);
     };
@@ -116,9 +118,9 @@ const Select: React.FC<SelectProps> = ({
             )}
             <ul
                 onClick={(e) => e.stopPropagation()}
-                className={`absolute z-10 top-full mt-1 w-full bg-white ${
-                    !openSelect && 'hidden'
-                }`}
+                className={`absolute ${
+                    zIndex ? `z-${zIndex}` : 'z-10'
+                } top-full mt-1 w-full bg-white ${!openSelect && 'hidden'}`}
             >
                 {options.map((el, index) => (
                     <li

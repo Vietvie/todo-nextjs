@@ -30,6 +30,7 @@ const Search = () => {
             />
             <div className="w-40 border-l">
                 <Select
+                    zIndex={50}
                     isClearable={true}
                     options={statusOptions}
                     onSelect={(value) =>
@@ -43,7 +44,7 @@ const Search = () => {
                               }
                             : null
                     }
-                    placehodler="Trạng thái.."
+                    placehodler="Trạng thái..."
                 />
             </div>
             <span className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-gray-400">

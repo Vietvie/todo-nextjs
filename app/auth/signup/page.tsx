@@ -1,5 +1,6 @@
 'use client';
 import authApi from '@/services/auth';
+import { useRouter } from 'next/router';
 import React, { FormEvent, useState } from 'react';
 
 const Sigup = () => {
@@ -13,6 +14,7 @@ const Sigup = () => {
         name: '',
     });
 
+    const router = useRouter();
     const handleInput = (e: FormEvent<HTMLInputElement>) => {
         const name = e.currentTarget.name;
         const value = e.currentTarget.value;
@@ -24,6 +26,7 @@ const Sigup = () => {
         try {
             const { data } = await authApi.signup(formInput);
             console.log(data);
+            return router.push('/todo');
         } catch (error) {
             console.log(error);
         }

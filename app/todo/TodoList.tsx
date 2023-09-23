@@ -1,11 +1,14 @@
 import Select, { SelectOption } from '@/components/Select';
 import TodoState from '@/models/TodoState';
-import { AppDispatch } from '@/store';
+import { AppDispatch, useAppSelector } from '@/store';
 import { todoAction } from '@/store/todoSlice';
 import convertStatus from '@/utils/convertStatus';
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+    faChevronCircleRight,
+    faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { format, fromUnixTime } from 'date-fns';
+import { format, fromUnixTime, getUnixTime } from 'date-fns';
 import React, { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import EditTaskName from './EditTaskName';
@@ -14,6 +17,7 @@ import { UserOptions } from './page';
 import todoApi from '@/services/todo';
 import { TodoCustomForFE } from '@/interface';
 import userTodoApi from '@/services/userTodoApi';
+import { useRouter } from 'next/navigation';
 
 type todoList = {
     list: TodoState[];
@@ -38,15 +42,29 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
             sortType: 'asc',
         },
     ]);
+    const { userInfo } = useAppSelector((state) => state.auth);
+    const router = useRouter();
     const dateInputRef = useRef<HTMLInputElement>(null);
-    const handleUpdateStatus = (select: SelectOption | null, id?: number) => {
+    const handleUpdateStatus = async (
+        select: SelectOption | null,
+        id?: number
+    ) => {
+        console.log(select);
         if (!id || !select) return;
-        dispatch(
-            todoAction.updateStatus({
-                id,
+        try {
+            await todoApi.updateTodo(id, {
                 status: select.value,
-            })
-        );
+            });
+
+            dispatch(
+                todoAction.updateStatus({
+                    id,
+                    status: select.value,
+                })
+            );
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const handleOpenEditTaskName = (id: number) => {
@@ -57,23 +75,22 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
         dateInputRef.current?.showPicker();
     };
 
-    const handleUpdateDeadline = (newDeadline: string, id: number) => {
-        dispatch(
-            todoAction.updateDeadline({
-                id,
-                newDeadline: new Date(newDeadline).getTime(),
-            })
-        );
+    const handleUpdateDeadline = async (newDeadline: string, id: number) => {
+        console.log(newDeadline, id);
+        try {
+            await todoApi.changeDeadline(id, {
+                deadlineTime: getUnixTime(new Date(newDeadline)),
+            });
+            dispatch(
+                todoAction.updateDeadline({
+                    id,
+                    newDeadline: getUnixTime(new Date(newDeadline)),
+                })
+            );
+        } catch (error) {
+            console.log(error);
+        }
     };
-
-    // const handleSort = (sortBy: 'createTime' | 'deadlineTime') => {
-    //     dispatch(
-    //         todoAction.sort({
-    //             sortBy,
-    //             sortType: sortList.find((el) => el.sortBy === sortBy)?.sortType,
-    //         })
-    //     );
-    // };
 
     const handleSelect = async (select: SelectOption[], id?: number) => {
         if (id) {
@@ -112,7 +129,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
         }
     };
 
-    const handleRemove = async (select: SelectOption, id: number) => {
+    const handleRemoveAssignees = async (select: SelectOption, id: number) => {
         try {
             await userTodoApi.deleteAssignedUser({
                 user_id: select.value,
@@ -157,10 +174,15 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
             })
         );
     };
+
+    const getTodoDetail = (id: string | number) => {
+        return router.push(`/todo/${id}`);
+    };
+
     return (
         <div className="h-full">
             <table className="w-full">
-                <thead className="text-left sticky top-0 p-2 bg-zinc-100 z-1">
+                <thead className="text-left sticky top-0 p-2 bg-zinc-100 z-20">
                     <tr>
                         <th className="p-2">#</th>
                         <th className="p-2">Task</th>
@@ -199,6 +221,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                         <EditTaskName
                                             id={el.id}
                                             taskName={el.name.value}
+                                            currentTaskName={el.name.value}
                                         />
                                     )}
                                 </div>
@@ -213,23 +236,24 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                 className="p-2 relative"
                                 onClick={handleOpenDatePicker}
                             >
-                                <div className="relative">
-                                    {format(
+                                <input
+                                    disabled={
+                                        !userInfo ||
+                                        `${userInfo.id}` !==
+                                            el.createBy.split('@')[0]
+                                    }
+                                    type="date"
+                                    value={format(
                                         fromUnixTime(el.deadlineTime),
-                                        'dd/MM/yyyy'
+                                        'yyyy-MM-dd'
                                     )}
-                                    <input
-                                        className="w-0 h-0 absolute top-full mt-1 left-0"
-                                        type="date"
-                                        ref={dateInputRef}
-                                        onChange={(e) =>
-                                            handleUpdateDeadline(
-                                                e.target.value,
-                                                el.id
-                                            )
-                                        }
-                                    />
-                                </div>
+                                    onChange={(e) =>
+                                        handleUpdateDeadline(
+                                            e.target.value,
+                                            el.id
+                                        )
+                                    }
+                                />
                             </td>
                             <td className="p-2">
                                 <Select
@@ -251,16 +275,40 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                     value={el.processBy}
                                     multiple
                                     onSelect={handleSelect}
-                                    onRemove={handleRemove}
+                                    onRemove={handleRemoveAssignees}
                                 />
                             </td>
-                            <td className="p-2 flex justify-center">
-                                <span
-                                    onClick={() => onRemove(el.id)}
-                                    className="h-10 aspect-square hover:bg-slate-200 flex items-center justify-center "
+                            <td className="p-2 flex justify-center items-center">
+                                <button
+                                    disabled={
+                                        !userInfo ||
+                                        `${userInfo.id}` !==
+                                            el.createBy.split('@')[0]
+                                    }
+                                    onClick={
+                                        userInfo &&
+                                        `${userInfo.id}` ===
+                                            el.createBy.split('@')[0]
+                                            ? () => onRemove(el.id)
+                                            : () => {}
+                                    }
+                                    className="h-10 aspect-square hover:bg-slate-200 flex items-center justify-center disabled:text-gray-300"
                                 >
                                     <FontAwesomeIcon icon={faTrashAlt} />
-                                </span>
+                                </button>
+                                <button
+                                    onClick={() => getTodoDetail(el.id)}
+                                    disabled={
+                                        !userInfo ||
+                                        `${userInfo.id}` !==
+                                            el.createBy.split('@')[0]
+                                    }
+                                    className="h-10 aspect-square hover:bg-slate-200 flex items-center justify-center disabled:text-gray-300"
+                                >
+                                    <FontAwesomeIcon
+                                        icon={faChevronCircleRight}
+                                    />
+                                </button>
                             </td>
                         </tr>
                     ))}

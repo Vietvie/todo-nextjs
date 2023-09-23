@@ -15,9 +15,10 @@ import Search from './Search';
 import todoApi from '@/services/todo';
 import { getUnixTime } from 'date-fns';
 import { TodoCustomForFE } from '@/interface';
-import { faSleigh } from '@fortawesome/free-solid-svg-icons';
 import userApi from '@/services/user';
 import convertUserToSelectOption from '@/utils/convertUserToSelectOption';
+import { getUserInfoByToken } from '@/store/authSlice';
+import authApi from '@/services/auth';
 
 export type UserOptions = {
     value: number | string;
@@ -71,8 +72,13 @@ function Todo() {
         }
     };
 
-    const handleRemove = (id: number) => {
-        dispatch(todoAction.removeTodo(id));
+    const handleRemove = async (id: number) => {
+        try {
+            await todoApi.deleteTodo(id);
+            dispatch(todoAction.removeTodo(id));
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const handleSelect = (select: SelectOption[]) => {
@@ -87,6 +93,22 @@ function Todo() {
         setDate(e.currentTarget.value);
     };
 
+    const filter = useAppSelector((state) => state.filter);
+    const todoListFiltered = todoList.filter((el) => {
+        return (
+            el.name.value.includes(filter.task) &&
+            `${el.status}`.includes(filter.status)
+        );
+    });
+
+    const handleLogout = async () => {
+        try {
+            await authApi.logout();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
         const fetchMyTodo = async () => {
             try {
@@ -95,7 +117,7 @@ function Todo() {
                 const myTodo = data.data.myTodoMaped.map(
                     (el: TodoCustomForFE) => ({
                         ...el,
-                        name: { value: el.name, editing: faSleigh },
+                        name: { value: el.name, editing: false },
                         processBy: el.processBy.map((el) => ({
                             value: el.id,
                             label: el.name,
@@ -120,11 +142,21 @@ function Todo() {
             }
         };
 
+        dispatch(getUserInfoByToken());
+
         fetchUser();
         fetchMyTodo();
     }, []);
     return (
         <div className="h-screen flex text-black bg-zinc-100 flex-col items-center ">
+            <div className=" flex justify-end w-full p-4">
+                <button
+                    onClick={handleLogout}
+                    className="p-2 bg-black text-white rounded-lg"
+                >
+                    Logout
+                </button>
+            </div>
             <div className="w-full p-8 flex flex-col gap-8 h-full overflow-auto">
                 <h1 className="text-black font-semibold text-2xl">Todo app</h1>
                 <div className="flex gap-2 items-center bg-white rounded-lg shadow-md">
@@ -158,6 +190,7 @@ function Todo() {
                                 options={user}
                                 placehodler="Người xử lý"
                                 onSelect={handleSelect}
+                                zIndex={50}
                             />
                         </div>
                     </div>
@@ -173,7 +206,7 @@ function Todo() {
                 <div className="flex-1 overflow-auto">
                     <TodoList
                         user={user}
-                        list={todoList}
+                        list={todoListFiltered}
                         onRemove={handleRemove}
                     />
                 </div>

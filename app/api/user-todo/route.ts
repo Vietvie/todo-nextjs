@@ -67,10 +67,15 @@ export const PATCH = async (req: NextRequest) => {
     });
 
     if (currentTodo?.create_by_id !== tokenDecoded.id)
-        return NextResponse.json({
-            statue: 'fail',
-            message: `you not is owner of todo #${data.todo_id}`,
-        });
+        return NextResponse.json(
+            {
+                statue: 'fail',
+                message: `you not is owner of todo #${data.todo_id}`,
+            },
+            {
+                status: 400,
+            }
+        );
 
     const userTodoDeleted = await prisma.userTodo.delete({
         where: {

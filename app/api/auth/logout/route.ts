@@ -4,5 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const GET = async (req: NextRequest) => {
     console.log('logout');
     cookies().delete('token');
-    return NextResponse.redirect(new URL('/auth/login', req.url));
+    const loginUrl = new URL('/auth/login', req.url);
+    loginUrl.searchParams.set('from', req.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
 };

@@ -6,12 +6,12 @@ export async function middleware(req: NextRequest) {
     if (!token) return NextResponse.redirect(new URL('/auth/login', req.url));
 
     //Redirect If Logined
-    const redirectIfHadCookies = ['/auth/login', '/auth/signup'];
-    if (redirectIfHadCookies.includes(req.nextUrl.pathname))
-        return NextResponse.redirect(new URL('/todo', req.url));
+    // const redirectIfHadCookies = ['/auth/login', '/auth/signup'];
+    // if (redirectIfHadCookies.includes(req.nextUrl.pathname))
+    //     NextResponse.redirect(new URL('/todo', req.url));
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ['/todo/:path*', '/auth/:path*'],
+    matcher: ['/todo/:path*'],
 };

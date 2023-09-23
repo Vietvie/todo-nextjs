@@ -1,6 +1,6 @@
 'use client';
 import authApi from '@/services/auth';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import React, { FormEvent, useState } from 'react';
 
 const Sigup = () => {

@@ -19,6 +19,7 @@ import userApi from '@/services/user';
 import convertUserToSelectOption from '@/utils/convertUserToSelectOption';
 import { getUserInfoByToken } from '@/store/authSlice';
 import authApi from '@/services/auth';
+import { useRouter } from 'next/navigation';
 
 export type UserOptions = {
     value: number | string;
@@ -26,6 +27,7 @@ export type UserOptions = {
 };
 
 function Todo() {
+    const router = useRouter();
     const [todo, setTodo] = useState('');
     const [user, setUser] = useState<UserOptions[]>([]);
     const [selected, setSelected] = useState<SelectOption[]>([]);
@@ -104,6 +106,7 @@ function Todo() {
     const handleLogout = async () => {
         try {
             await authApi.logout();
+            return router.push('/auth/login');
         } catch (error) {
             console.log(error);
         }

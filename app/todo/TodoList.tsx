@@ -131,10 +131,16 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
 
     const handleRemoveAssignees = async (select: SelectOption, id: number) => {
         try {
-            await userTodoApi.deleteAssignedUser({
+            const { data } = await userTodoApi.deleteAssignedUser({
                 user_id: select.value,
                 todo_id: id,
             });
+
+            console.log(data.type);
+
+            if (data.type && data.type === 'notowner') {
+                return dispatch(todoAction.removeTodo(id));
+            }
 
             dispatch(
                 todoAction.setTodo(
@@ -298,11 +304,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                 </button>
                                 <button
                                     onClick={() => getTodoDetail(el.id)}
-                                    disabled={
-                                        !userInfo ||
-                                        `${userInfo.id}` !==
-                                            el.createBy.split('@')[0]
-                                    }
+                                    disabled={!userInfo}
                                     className="h-10 aspect-square hover:bg-slate-200 flex items-center justify-center disabled:text-gray-300"
                                 >
                                     <FontAwesomeIcon

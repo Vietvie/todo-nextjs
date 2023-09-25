@@ -64,9 +64,17 @@ export const PATCH = async (req: NextRequest) => {
         where: {
             id: data.todo_id,
         },
+        include: {
+            assignees: true,
+        },
     });
 
-    if (currentTodo?.create_by_id !== tokenDecoded.id)
+    if (
+        currentTodo?.create_by_id !== tokenDecoded.id &&
+        !currentTodo?.assignees
+            .map((el) => el.user_id)
+            .includes(tokenDecoded.id)
+    )
         return NextResponse.json(
             {
                 statue: 'fail',
@@ -77,17 +85,42 @@ export const PATCH = async (req: NextRequest) => {
             }
         );
 
-    const userTodoDeleted = await prisma.userTodo.delete({
-        where: {
-            user_id_todo_id: {
-                todo_id: data.todo_id,
-                user_id: data.user_id,
+    if (data.user_id === tokenDecoded.id) {
+        await prisma.userTodo.delete({
+            where: {
+                user_id_todo_id: {
+                    todo_id: data.todo_id,
+                    user_id: data.user_id,
+                },
             },
-        },
-    });
+        });
+        return NextResponse.json({
+            status: 'success',
+            type: 'notowner',
+        });
+    } else if (currentTodo.create_by_id === tokenDecoded.id) {
+        const userTodoDeleted = await prisma.userTodo.delete({
+            where: {
+                user_id_todo_id: {
+                    todo_id: data.todo_id,
+                    user_id: data.user_id,
+                },
+            },
+        });
 
-    return NextResponse.json({
-        status: 'success',
-        userTodoDeleted,
-    });
+        return NextResponse.json({
+            status: 'success',
+            userTodoDeleted,
+        });
+    }
+
+    return NextResponse.json(
+        {
+            status: 'fail',
+            message: 'some thing went wrong',
+        },
+        {
+            status: 404,
+        }
+    );
 };

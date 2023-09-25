@@ -116,7 +116,6 @@ function Todo() {
         const fetchMyTodo = async () => {
             try {
                 const { data } = await todoApi.myTodo();
-                console.log(data.data.myTodoMaped);
                 const myTodo = data.data.myTodoMaped.map(
                     (el: TodoCustomForFE) => ({
                         ...el,

@@ -104,7 +104,9 @@ const Select: React.FC<SelectProps> = ({
                             {el.label}
                         </button>
                     ))}
-                {!multiple && value && <span>{value.label}</span>}
+                {!multiple && value && (
+                    <span className="cursor-pointer">{value.label}</span>
+                )}
                 {((multiple && value.length === 0) || !value) &&
                     (placehodler || 'select...')}
             </div>

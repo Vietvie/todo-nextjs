@@ -119,7 +119,7 @@ const Select: React.FC<SelectProps> = ({
             <ul
                 onClick={(e) => e.stopPropagation()}
                 className={`absolute ${
-                    zIndex ? `z-${zIndex}` : 'z-10'
+                    zIndex ? `z-50` : 'z-10'
                 } top-full mt-1 w-full bg-white ${!openSelect && 'hidden'}`}
             >
                 {options.map((el, index) => (

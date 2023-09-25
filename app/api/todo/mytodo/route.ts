@@ -22,6 +22,8 @@ export async function GET(req: NextRequest) {
     const queryPrismaNoPagination = new APIFeature(queryObj).filter().query;
     const queryPrisma = new APIFeature(queryObj).filter().pagination().query;
 
+    console.log(queryPrisma);
+
     const tokenDecoded: jwt.JwtPayload | string | undefined = decodeJwt(req);
 
     if (!tokenDecoded) {

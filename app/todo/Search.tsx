@@ -1,22 +1,30 @@
 import Select from '@/components/Select';
 import { Status } from '@/constants';
 import statusOptions from '@/dev-data/stauts';
+import todoApi from '@/services/todo';
 import { AppDispatch, useAppSelector } from '@/store';
 import { filterAction } from '@/store/filterSlice';
 import convertStatus from '@/utils/convertStatus';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { FormEvent } from 'react';
+import { config } from 'process';
+import React, { FC, FormEvent } from 'react';
 import { useDispatch } from 'react-redux';
+import { PageInfo } from './page';
 
-const Search = () => {
+interface SearchProps {
+    onChange: React.Dispatch<React.SetStateAction<PageInfo>>;
+}
+const Search: FC<SearchProps> = ({ onChange }) => {
     const filter = useAppSelector((state) => state.filter);
     const dispatch = useDispatch<AppDispatch>();
     const handleSetTask = (e: FormEvent<HTMLInputElement>) => {
+        onChange((prev) => ({ ...prev, pageNum: 1 }));
         dispatch(filterAction.changeTask(e.currentTarget.value));
     };
 
     const handleSetStatus = (value: Status | '') => {
+        onChange((prev) => ({ ...prev, pageNum: 1 }));
         dispatch(filterAction.filterStatus(value));
     };
 

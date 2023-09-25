@@ -8,8 +8,15 @@ const todoApi = {
         const baseURL = `/todo/${id}`;
         return axiosClient.get(baseURL);
     },
-    myTodo() {
-        const baseURL = '/todo/mytodo';
+    myTodo(data?: { [key: string]: string | number }) {
+        let query: string = '';
+        if (data && Object.keys(data).length > 0) {
+            query = Object.keys(data)
+                .map((el) => `${el}=${data[el]}`)
+                .join('&');
+        }
+        const baseURL = `/todo/mytodo?` + query;
+        console.log(baseURL);
         return axiosClient.get(baseURL);
     },
     addNewTodo(data: {

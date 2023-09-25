@@ -20,10 +20,16 @@ import convertUserToSelectOption from '@/utils/convertUserToSelectOption';
 import { getUserInfoByToken } from '@/store/authSlice';
 import authApi from '@/services/auth';
 import { useRouter } from 'next/navigation';
+import Paginantion from './Paginantion';
 
 export type UserOptions = {
     value: number | string;
     label: string;
+};
+
+export type PageInfo = {
+    pageNum: number;
+    limit: number;
 };
 
 function Todo() {
@@ -39,6 +45,12 @@ function Todo() {
     const handleInput = (e: FormEvent<HTMLInputElement>) => {
         setTodo(e.currentTarget.value);
     };
+    const [page, setPage] = useState<PageInfo>({
+        pageNum: 1,
+        limit: 2,
+    });
+
+    const [totalPage, setTotalPage] = useState(0);
 
     const handleAddTodo = async () => {
         if (todo && date && selected) {
@@ -96,13 +108,6 @@ function Todo() {
     };
 
     const filter = useAppSelector((state) => state.filter);
-    const todoListFiltered = todoList.filter((el) => {
-        return (
-            el.name.value.includes(filter.task) &&
-            `${el.status}`.includes(filter.status)
-        );
-    });
-
     const handleLogout = async () => {
         try {
             await authApi.logout();
@@ -115,7 +120,13 @@ function Todo() {
     useEffect(() => {
         const fetchMyTodo = async () => {
             try {
-                const { data } = await todoApi.myTodo();
+                const queryObj: { [key: string]: any } = {};
+                if (filter.status) queryObj.status = filter.status;
+                if (filter.task) queryObj[`name[contains]`] = filter.task;
+                queryObj.limit = page.limit;
+                queryObj.page = page.pageNum;
+
+                const { data } = await todoApi.myTodo(queryObj);
                 const myTodo = data.data.myTodoMaped.map(
                     (el: TodoCustomForFE) => ({
                         ...el,
@@ -127,6 +138,7 @@ function Todo() {
                     })
                 );
                 dispatch(todoAction.setTodo(myTodo));
+                setTotalPage(data.allTodo);
             } catch (error) {
                 console.log(error);
             }
@@ -145,13 +157,12 @@ function Todo() {
         };
 
         dispatch(getUserInfoByToken());
-
         fetchUser();
         fetchMyTodo();
-    }, []);
+    }, [filter, page]);
     return (
         <div className="h-screen flex text-black bg-zinc-100 flex-col items-center ">
-            <div className=" flex justify-end w-full p-4">
+            <div className=" flex justify-end w-full px-4 py-2">
                 <button
                     onClick={handleLogout}
                     className="p-2 bg-black text-white rounded-lg"
@@ -159,7 +170,7 @@ function Todo() {
                     Logout
                 </button>
             </div>
-            <div className="w-full p-8 flex flex-col gap-8 h-full overflow-auto">
+            <div className="w-full px-8 py-4 flex flex-col gap-8 h-full overflow-auto">
                 <h1 className="text-black font-semibold text-2xl">Todo app</h1>
                 <div className="flex gap-2 items-center bg-white rounded-lg shadow-md">
                     <input
@@ -204,15 +215,21 @@ function Todo() {
                         Add
                     </button>
                 </div>
-                <Search />
+                <Search onChange={setPage} />
                 <div className="flex-1 overflow-auto">
                     <TodoList
                         user={user}
-                        list={todoListFiltered}
+                        list={todoList}
                         onRemove={handleRemove}
                     />
                 </div>
             </div>
+            <Paginantion
+                page={page.pageNum}
+                limit={page.limit}
+                total={totalPage}
+                onChange={setPage}
+            />
         </div>
     );
 }

@@ -187,39 +187,39 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
 
     return (
         <div className="h-full">
-            <table className="w-full">
-                <thead className="text-left sticky top-0 p-2 bg-zinc-100 z-20">
-                    <tr>
-                        <th className="p-2">#</th>
-                        <th className="p-2">Task</th>
+            <table className="w-full text-sm">
+                <thead className="text-left sticky top-0 p-2 bg-zinc-100 z-20 ">
+                    <tr className="grid-cols-12 grid">
+                        <th className="p-1 col-span-1">#</th>
+                        <th className="p-1 col-span-1">Task</th>
                         <th
                             onClick={() => toggleSort('createTime')}
-                            className="p-2"
+                            className="p-1 col-span-1"
                         >
                             Ngày tạo
                         </th>
                         <th
                             onClick={() => toggleSort('deadlineTime')}
-                            className="p-2"
+                            className="p-1 col-span-2"
                         >
                             Deadline
                         </th>
-                        <th className="p-2">Trạng thái</th>
-                        <th className="p-2">Người tạo</th>
-                        <th className="p-2">Người xử lý</th>
-                        <th className=" text-center">Thao tác</th>
+                        <th className="p-1 col-span-2">Trạng thái</th>
+                        <th className="p-1 col-span-1">Người tạo</th>
+                        <th className="p-1 col-span-3">Người xử lý</th>
+                        <th className=" text-center col-span-1">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     {list.map((el, index) => (
                         <tr
                             key={index}
-                            className="bg-white hover:bg-slate-200 rounded-lg"
+                            className="bg-white items-center hover:bg-slate-200 rounded-lg grid grid-cols-12"
                         >
-                            <td className="p-2">{index + 1}</td>
+                            <td className="p-1 col-span-1">{index + 1}</td>
                             <td
                                 onClick={() => handleOpenEditTaskName(el.id)}
-                                className="p-2"
+                                className="p-1 col-span-1"
                             >
                                 <div className="relative">
                                     <span>{el.name.value}</span>
@@ -232,14 +232,14 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                     )}
                                 </div>
                             </td>
-                            <td className="p-2">
+                            <td className="p-1 col-span-1">
                                 {format(
                                     fromUnixTime(el.createTime),
                                     'dd/MM/yyyy'
                                 )}
                             </td>
                             <td
-                                className="p-2 relative"
+                                className="p-1 relative col-span-2"
                                 onClick={handleOpenDatePicker}
                             >
                                 <input
@@ -261,7 +261,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                     }
                                 />
                             </td>
-                            <td className="p-2">
+                            <td className="p-1 col-span-2">
                                 <Select
                                     titleStyle={convertStatus(el.status).style}
                                     id={el.id}
@@ -273,8 +273,10 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                     onSelect={handleUpdateStatus}
                                 />
                             </td>
-                            <td className="p-2">{el.createBy.split('@')[1]}</td>
-                            <td className="p-2  cursor-pointer">
+                            <td className="p-1 col-span-1">
+                                {el.createBy.split('@')[1]}
+                            </td>
+                            <td className="p-1  cursor-pointer col-span-3">
                                 <Select
                                     id={el.id}
                                     options={user}
@@ -284,7 +286,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                                     onRemove={handleRemoveAssignees}
                                 />
                             </td>
-                            <td className="p-2 flex justify-center items-center">
+                            <td className="p-1 flex justify-center items-center col-span-1">
                                 <button
                                     disabled={
                                         !userInfo ||

@@ -144,11 +144,18 @@ export const PUT = async (
                 },
                 where: {
                     id,
-                    assignees: {
-                        some: {
-                            user_id: tokenDecoded.id,
+                    OR: [
+                        {
+                            assignees: {
+                                some: {
+                                    user_id: tokenDecoded.id,
+                                },
+                            },
                         },
-                    },
+                        {
+                            create_by_id: tokenDecoded.id,
+                        },
+                    ],
                 },
                 include: {
                     assignees: {

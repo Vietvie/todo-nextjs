@@ -136,10 +136,3 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// export const POST = async (req: Request) => {
-//     const data = await req.json();
-//     const newTodo = await prisma.todo.create({
-//         data,
-//     });
-//     return NextResponse.json(newTodo);
-// };

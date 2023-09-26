@@ -85,7 +85,10 @@ export const PATCH = async (req: NextRequest) => {
             }
         );
 
-    if (data.user_id === tokenDecoded.id) {
+    if (
+        data.user_id === tokenDecoded.id &&
+        currentTodo.create_by_id !== tokenDecoded.id
+    ) {
         await prisma.userTodo.delete({
             where: {
                 user_id_todo_id: {

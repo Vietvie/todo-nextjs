@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
     });
 
     const queryPrismaNoPagination = new APIFeature(queryObj).filter().query;
-    const queryPrisma = new APIFeature(queryObj).filter().pagination().query;
+    const queryPrisma = new APIFeature(queryObj)
+        .filter()
+        .pagination()
+        .sort().query;
 
     console.log(queryPrisma);
 

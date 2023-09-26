@@ -18,6 +18,8 @@ import todoApi from '@/services/todo';
 import { TodoCustomForFE } from '@/interface';
 import userTodoApi from '@/services/userTodoApi';
 import { useRouter } from 'next/navigation';
+import { filterAction } from '@/store/filterSlice';
+import { SortType } from '@/constants';
 
 type todoList = {
     list: TodoState[];
@@ -162,12 +164,28 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
     };
 
     const toggleSort = (sortBy: 'createTime' | 'deadlineTime') => {
-        dispatch(
-            todoAction.sort({
-                sortBy: sortBy,
-                sortType: sortList.find((el) => el.sortBy === sortBy)?.sortType,
-            })
-        );
+        // dispatch(
+        //     todoAction.sort({
+        //         sortBy: sortBy,
+        //         sortType: sortList.find((el) => el.sortBy === sortBy)?.sortType,
+        //     })
+        // );
+
+        if (sortBy === 'createTime') {
+            dispatch(
+                filterAction.sortByCreateTime(
+                    sortList.find((el) => el.sortBy === sortBy)!.sortType
+                )
+            );
+        }
+        if (sortBy === 'deadlineTime') {
+            dispatch(
+                filterAction.sortByDeadlineTime(
+                    sortList.find((el) => el.sortBy === sortBy)!.sortType
+                )
+            );
+        }
+
         setSortList((prev) =>
             prev.map((el) => {
                 if (el.sortBy === sortBy) {

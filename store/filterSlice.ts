@@ -1,9 +1,16 @@
-import { Status } from '@/constants';
+import { SortType, Status } from '@/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState: { task: string; status: Status | '' } = {
+const initialState: {
+    task: string;
+    status: Status | '';
+    createTime: 'asc' | 'desc' | '';
+    deadlineTime: 'asc' | 'desc' | '';
+} = {
     task: '',
     status: '',
+    createTime: '',
+    deadlineTime: '',
 };
 
 const filterSlice = createSlice({
@@ -15,6 +22,12 @@ const filterSlice = createSlice({
         },
         filterStatus(state, action: PayloadAction<Status | ''>) {
             state.status = action.payload;
+        },
+        sortByCreateTime(state, action: PayloadAction<'asc' | 'desc' | ''>) {
+            state.createTime = action.payload;
+        },
+        sortByDeadlineTime(state, action: PayloadAction<'asc' | 'desc' | ''>) {
+            state.deadlineTime = action.payload;
         },
     },
 });

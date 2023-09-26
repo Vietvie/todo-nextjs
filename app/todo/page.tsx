@@ -21,6 +21,7 @@ import { getUserInfoByToken } from '@/store/authSlice';
 import authApi from '@/services/auth';
 import { useRouter } from 'next/navigation';
 import Paginantion from './Paginantion';
+import { es } from 'date-fns/locale';
 
 export type UserOptions = {
     value: number | string;
@@ -118,11 +119,39 @@ function Todo() {
     };
 
     useEffect(() => {
+        console.log(filter);
         const fetchMyTodo = async () => {
             try {
                 const queryObj: { [key: string]: any } = {};
                 if (filter.status) queryObj.status = filter.status;
                 if (filter.task) queryObj[`name[contains]`] = filter.task;
+                let sort: (
+                    | 'create_time'
+                    | 'deadline_time'
+                    | '-create_time'
+                    | '-deadline_time'
+                )[] = [];
+                if (filter.createTime) {
+                    if (filter.createTime === 'desc') {
+                        const create_time_desc = '-create_time';
+                        sort.push(create_time_desc);
+                    } else {
+                        sort.push('create_time');
+                    }
+                }
+
+                if (filter.deadlineTime) {
+                    if (filter.deadlineTime === 'desc') {
+                        const deadline_time_desc = '-deadline_time';
+                        sort.push(deadline_time_desc);
+                    } else {
+                        sort.push('deadline_time');
+                    }
+                }
+
+                if (sort.length > 0) {
+                    queryObj.sort = sort.join(',');
+                }
                 queryObj.limit = page.limit;
                 queryObj.page = page.pageNum;
 

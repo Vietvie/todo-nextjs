@@ -3,3 +3,8 @@ export enum Status {
     Completed = 'completed',
     Cancelled = 'cancelled',
 }
+
+export enum SortType {
+    Desc = 'desc',
+    Asc = 'asc',
+}

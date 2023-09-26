@@ -89,7 +89,7 @@ const Select: React.FC<SelectProps> = ({
             tabIndex={1}
         >
             <div
-                className={`rounded-lg py-[2px] px-1 flex flex-wrap gap-1 ${titleStyle}`}
+                className={`rounded-lg py-[2px] px-1 flex items-center it flex-wrap gap-1 ${titleStyle}`}
             >
                 {multiple &&
                     value.map((el, index) => (
@@ -111,7 +111,10 @@ const Select: React.FC<SelectProps> = ({
                     (placehodler || 'select...')}
             </div>
             {isClearable && value && (
-                <span onClick={handleRemoveSelect}>
+                <span
+                    className="flex items-center"
+                    onClick={handleRemoveSelect}
+                >
                     <FontAwesomeIcon
                         className="pointer-events-none p-1"
                         icon={faXmark}

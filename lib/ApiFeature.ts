@@ -11,13 +11,13 @@ interface QueryStringType {
 
 interface QueryPrisma {
     where?: {};
+    orderBy?: {};
     skip?: number;
     take?: number;
 }
 
 type KeyQuery = 'sort' | 'page' | 'limit' | 'fields';
 type NumberFiedls = 'id' | 'create_time' | 'deadline_time';
-type ConditionQuery = 'contains' | 'gt' | 'gte';
 
 class APIFeature {
     query: QueryPrisma;
@@ -65,21 +65,37 @@ class APIFeature {
         return this;
     }
 
-    // sort() {
-    //     //2, Sort
-    //     if (this.queryString.sort) {
-    //         let sortBy = this.queryString.sort.split(',');
-    //         sortBy = sortBy.map((el) => {
-    //             if (el.startsWith('-')) {
-    //                 el = el.replace('-', '');
-    //                 return [el, 'desc'];
-    //             }
-    //             return [el, 'asc'];
-    //         });
-    //         this.query.order = sortBy;
-    //     }
-    //     return this;
-    // }
+    sort() {
+        //2, Sort
+        if (this.queryString.sort) {
+            console.log(this.queryString.sort);
+            let sortBy: any[] = this.queryString.sort.split(',');
+
+            // const sortByObj: { [key: string]: any }[] = [];
+            // // const sortQueryObj: { [key: string]: any } = {};
+            // sortBy.forEach((el: string) => {
+            //     if (el.startsWith('-')) {
+            //         el = el.replace('-', '');
+            //         return sortByObj[el as string] =
+            //     }
+            //     return;
+            // });
+            sortBy = sortBy.map((el) => {
+                if (el.startsWith('-')) {
+                    el = el.replace('-', '');
+                    return { [el]: 'desc' };
+                }
+                return { [el]: 'asc' };
+            });
+            this.query.orderBy = sortBy;
+        }
+
+        return this;
+    }
+
+    // orderBy: {
+    //     create_time: 'desc',
+    // },
 
     // fields() {
     //     //3,Limit Fields

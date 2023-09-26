@@ -1,7 +1,7 @@
 import todoApi from '@/services/todo';
 import { AppDispatch } from '@/store';
 import { todoAction } from '@/store/todoSlice';
-import React, { FC, FormEvent, useState } from 'react';
+import React, { FC, FormEvent, KeyboardEvent, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const EditTaskName: FC<{
@@ -24,15 +24,20 @@ const EditTaskName: FC<{
             dispatch(todoAction.updateTaskName({ id, newTaskName: newTask }));
         } catch (error) {
             console.log(error);
-            console.log('first');
             dispatch(
                 todoAction.updateTaskName({ id, newTaskName: currentTaskName })
             );
         }
     };
+
+    const handlerEnter = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== 'Enter') return;
+        updateNewTaskName(currentTaskName);
+    };
     return (
         <div className="absolute top-0 h-full w-full z-10">
             <input
+                onKeyDown={handlerEnter}
                 autoFocus={true}
                 onBlur={() => updateNewTaskName(currentTaskName)}
                 value={newTask}

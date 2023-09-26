@@ -4,6 +4,8 @@ import { AppDispatch, useAppSelector } from '@/store';
 import { todoAction } from '@/store/todoSlice';
 import convertStatus from '@/utils/convertStatus';
 import {
+    faCaretDown,
+    faCaretUp,
     faChevronCircleRight,
     faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +15,7 @@ import React, { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import EditTaskName from './EditTaskName';
 import statusOptions from '@/dev-data/stauts';
-import { UserOptions } from './page';
+import { PageInfo, UserOptions } from './page';
 import todoApi from '@/services/todo';
 import { TodoCustomForFE } from '@/interface';
 import userTodoApi from '@/services/userTodoApi';
@@ -25,9 +27,10 @@ type todoList = {
     list: TodoState[];
     onRemove: (id: number) => void;
     user: UserOptions[];
+    setPage: React.Dispatch<React.SetStateAction<PageInfo>>;
 };
 
-const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
+const TodoList: React.FC<todoList> = ({ list, onRemove, user, setPage }) => {
     const dispatch = useDispatch<AppDispatch>();
     const [sortList, setSortList] = useState<
         {
@@ -45,6 +48,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
         },
     ]);
     const { userInfo } = useAppSelector((state) => state.auth);
+    const filter = useAppSelector((state) => state.filter);
     const router = useRouter();
     const dateInputRef = useRef<HTMLInputElement>(null);
     const handleUpdateStatus = async (
@@ -164,19 +168,13 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
     };
 
     const toggleSort = (sortBy: 'createTime' | 'deadlineTime') => {
-        // dispatch(
-        //     todoAction.sort({
-        //         sortBy: sortBy,
-        //         sortType: sortList.find((el) => el.sortBy === sortBy)?.sortType,
-        //     })
-        // );
-
         if (sortBy === 'createTime') {
             dispatch(
                 filterAction.sortByCreateTime(
                     sortList.find((el) => el.sortBy === sortBy)!.sortType
                 )
             );
+            setPage((prev) => ({ ...prev, pageNum: 1 }));
         }
         if (sortBy === 'deadlineTime') {
             dispatch(
@@ -184,6 +182,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                     sortList.find((el) => el.sortBy === sortBy)!.sortType
                 )
             );
+            setPage((prev) => ({ ...prev, pageNum: 1 }));
         }
 
         setSortList((prev) =>
@@ -214,13 +213,29 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user }) => {
                             onClick={() => toggleSort('createTime')}
                             className="p-1 col-span-1"
                         >
-                            Ngày tạo
+                            <div className="flex items-center gap-1">
+                                <span>Ngày tạo</span>
+                                {filter.createTime === 'desc' && (
+                                    <FontAwesomeIcon icon={faCaretDown} />
+                                )}
+                                {filter.createTime === 'asc' && (
+                                    <FontAwesomeIcon icon={faCaretUp} />
+                                )}
+                            </div>
                         </th>
                         <th
                             onClick={() => toggleSort('deadlineTime')}
                             className="p-1 col-span-2"
                         >
-                            Deadline
+                            <div className="flex items-center gap-1">
+                                <span> Deadline</span>
+                                {filter.deadlineTime === 'desc' && (
+                                    <FontAwesomeIcon icon={faCaretDown} />
+                                )}
+                                {filter.deadlineTime === 'asc' && (
+                                    <FontAwesomeIcon icon={faCaretUp} />
+                                )}
+                            </div>
                         </th>
                         <th className="p-1 col-span-2">Trạng thái</th>
                         <th className="p-1 col-span-1">Người tạo</th>

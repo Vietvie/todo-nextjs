@@ -264,6 +264,7 @@ function Todo() {
                         user={user}
                         list={todoList}
                         onRemove={handleRemove}
+                        setPage={setPage}
                     />
                 </div>
             </div>

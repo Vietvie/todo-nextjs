@@ -249,7 +249,7 @@ const TodoList: React.FC<todoList> = ({ list, onRemove, user, setPage }) => {
                             key={index}
                             className="bg-white items-center hover:bg-slate-200 rounded-lg grid grid-cols-12"
                         >
-                            <td className="p-1 col-span-1">{index + 1}</td>
+                            <td className="p-1 col-span-1">{`#${el.id}`}</td>
                             <td
                                 onClick={() => handleOpenEditTaskName(el.id)}
                                 className="p-1 col-span-1"
